@@ -38,8 +38,6 @@ def get_details():
                     if not row[1] == "First Name":
                         if row[1] and row[5] and row[29]:
                             OLD_LIST.append(row[5])
-        else:
-            raise Exception("Old sender's list should also be in .csv format")
 
     if os.path.splitext(args.sender_list)[1] == ".csv":
         with open(args.sender_list, newline='') as csv_data:
@@ -47,7 +45,7 @@ def get_details():
             for row in reader:
                 if not row[1] == "First Name":
                     if OLD_LIST and row[5] in OLD_LIST:
-                        print("Skipping {0} - {1}. Email was sent in the previous run.".format(row[1], row[5]))
+                        print("Skipping previous emails")
                         continue
                     elif "Recruit" in row[31] or "Talent" in row[31] and row[1] and row[5] and row[29]:
                         SENDER_LIST['Name'].append(row[1].encode('ascii', 'ignore'))
@@ -77,9 +75,9 @@ def get_details():
                     content = data.read().decode().format(Name=recipient, Company=recipient_company, User=user)
 
                 msg = multipart.MIMEMultipart()
-                msg['From'] = gmail_user
+                msg['From'] = gmailUser
                 msg['To'] = str(mail_to)
-                msg['Subject'] = "Full-time opportunities at {}".format(recipient_company)
+                msg['Subject'] = "Seeking Full Time Position at {}".format(recipient_company)
                 msg.attach(text.MIMEText(content))
 
                 part = application.MIMEApplication(open(attachment, 'rb').read())
@@ -91,9 +89,8 @@ def get_details():
                     mailServer.ehlo()
                     mailServer.starttls()
                     mailServer.ehlo()
-                    mailServer.login(gmail_user, gmail_pwd)
-                    mailServer.sendmail(gmail_user, str(mail_to), msg.as_string())
-                    # Should be mailServer.quit(), but that crashes...
+                    mailServer.login(gmailUser, gmail_pwd)
+                    mailServer.sendmail(gmailUser, str(mail_to), msg.as_string())
                     mailServer.close()
                     print("Successfully sent the email to {}".format(recipient))
 
